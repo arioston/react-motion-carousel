@@ -1,6 +1,6 @@
-import React, { Props, useState, useEffect } from "react";
+import React, { Props, useState, useEffect, useCallback } from "react";
 
-type PaginationContextProps = {
+export type PaginationContextProps = {
   next: () => void;
   previous: () => void;
   setCards: (arr: unknown[]) => void;
@@ -9,54 +9,79 @@ type PaginationContextProps = {
   cards: unknown[];
   setPageSelected: (page: number) => void;
   isInRange: (index: number) => boolean;
-  initializeCards: (newCards: unknown[]) => void;
+  initializeCards: (newCards: unknown[] | unknown) => void;
+  numberOfPages: number;
 };
 
 export const PaginationContext = React.createContext<
   Partial<PaginationContextProps>
 >({});
 
+let cardList: unknown[] = [];
 export const PaginationProvider = <T extends object>({
   children,
   ..._rest
 }: Props<T>) => {
-  let cardList: unknown[] = [];
-
-  const [[pageSelected, cards], setPageSelectedAndCards] = useState<
-    [number, unknown[]]
-  >([-1, []]);
-  // const [cards, setCards] = useState([]);
-  const upperBound = Math.round(cards.length / 3);
+  const [pagination, setPageSelected] = useState<{
+    pageSelected: number;
+    cards: unknown[];
+  }>({ pageSelected: -1, cards: [] });
+  const { pageSelected, cards } = pagination;
+  const [upperBound, setUpperBound] = useState(0);
 
   const next = () => {
     if (pageSelected + 1 < upperBound) {
-      setPageSelectedAndCards([pageSelected + 1, cards]);
+      setPageSelected({
+        pageSelected: pageSelected + 1,
+        cards: cardList.filter((_, i) => isInRange(i, pageSelected + 1))
+      });
+      console.log(
+        "next",
+        cardList,
+        cardList.filter((_, i) => isInRange(i, pageSelected + 1))
+      );
     }
   };
 
   const previous = () => {
     if (pageSelected - 1 >= 0) {
-      setPageSelectedAndCards([pageSelected - 1, cards]);
+      setPageSelected({
+        pageSelected: pageSelected - 1,
+        cards: cardList.filter((_, i) => isInRange(i, pageSelected - 1))
+      });
+      console.log(
+        "previous",
+        cardList,
+        cardList.filter((_, i) => isInRange(i, pageSelected - 1))
+      );
     }
   };
 
-  const isInRange = (index: number) => {
-    return index >= pageSelected * 3 && index < pageSelected * 3 + 3;
+  const isInRange = (index: number, currentPageSelected = pageSelected) => {
+    return (
+      index >= currentPageSelected * 3 && index < currentPageSelected * 3 + 3
+    );
   };
 
-  const initializeCards = (newCards: unknown[]) => {
-    cardList = [...newCards];
-    setPageSelectedAndCards([0, []]);
+  const initializeCards = (newCards: unknown[] | unknown) => {
+    cardList = Array.isArray(newCards) ? [...newCards] : [newCards];
+    setPageSelected({
+      pageSelected: 0,
+      cards: cardList.filter((_, i) => isInRange(i, 0))
+    });
+    setUpperBound(Math.round(cardList.length / 3));
+    console.log("initializeCards", cardList);
   };
 
-  useEffect(
-    () =>
-      setPageSelectedAndCards([
-        pageSelected,
-        cardList.filter((_, i) => isInRange(i))
-      ]),
-    [pageSelected]
-  );
+  // useEffect(() => {
+  //   setTimeout(() => {
+  //     setPageSelected({
+  //       pageSelected,
+  //       cards: cardList.filter((_, i) => isInRange(i))
+  //     });
+  //     console.log("useEffect", pageSelected, cards);
+  //   }, 100);
+  // }, [pageSelected]);
 
   return (
     <PaginationContext.Provider
@@ -67,8 +92,12 @@ export const PaginationProvider = <T extends object>({
         cards,
         pageSelected,
         setPageSelected: (page: number) =>
-          setPageSelectedAndCards([page, cards]),
-        isInRange
+          setPageSelected({
+            pageSelected: page,
+            cards: cardList.filter((_, i) => isInRange(i, page))
+          }),
+        isInRange,
+        numberOfPages: upperBound
       }}
     >
       {children}

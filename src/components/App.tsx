@@ -29,12 +29,12 @@ const GlobalStyle = createGlobalStyle`
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
   }
-  
+
   .row {
     max-width: 50rem;
     margin-right: auto;
     margin-left: auto;
-    
+
     &:after {
       clear: both
     }
@@ -42,7 +42,7 @@ const GlobalStyle = createGlobalStyle`
     &:after, &:before {
       display: table;
       content: " ";
-    }  
+    }
   }
 
   .column, .columns {
@@ -102,7 +102,15 @@ export const App = () => {
           <Header />
           <SliderContainer>
             {cards.map((c, i) => (
-              <Card custom={i} key={c.id} {...c} />
+              <Card
+                custom={i}
+                key={String(c.id)}
+                imageUrl={c.imageUrl}
+                title={c.title}
+                category={c.category}
+                type={c.type}
+                date={c.date}
+              />
             ))}
           </SliderContainer>
         </PaginationProvider>

@@ -1,7 +1,7 @@
 import React, { useContext } from "react";
 import styled from "styled-components";
 import { range } from "ramda";
-import PaginationContext from "./pagination";
+import PaginationContext, { PaginationContextProps } from "./pagination";
 
 const StyledHeader = styled.div`
   display: flex;
@@ -124,9 +124,11 @@ export const Circle = ({ index, handlerCircleClick, pageSelected }: any) => {
 };
 
 export const Header = ({ handlerCircleClick }: any) => {
-  const pagination = useContext(PaginationContext);
-  const numberOfPages = Math.max(0, Math.trunc(pagination.cards.length / 3));
-  const circleList = range(0, numberOfPages);
+  const pagination = useContext(PaginationContext) as Required<
+    PaginationContextProps
+  >;
+
+  const circleList = range(0, pagination.numberOfPages);
   return (
     <StyledHeader className="row">
       <div className="title">Most Recent</div>
@@ -144,7 +146,8 @@ export const Header = ({ handlerCircleClick }: any) => {
         <div className="counter" id="homeCounter">
           <span className="slide-count">{`0${pagination.pageSelected +
             1}`}</span>{" "}
-          / <span className="slide-total">{`0${numberOfPages}`}</span>
+          /{" "}
+          <span className="slide-total">{`0${pagination.numberOfPages}`}</span>
         </div>
       </div>
     </StyledHeader>

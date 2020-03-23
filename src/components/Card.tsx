@@ -1,7 +1,12 @@
 import React, { useContext, useEffect } from "react";
 import styled from "styled-components";
-import { motion, useAnimation, AnimatePresence } from "framer-motion";
-import PaginationContext from "./pagination";
+import {
+  motion,
+  useAnimation,
+  AnimatePresence,
+  HTMLMotionProps
+} from "framer-motion";
+import PaginationContext, { PaginationContextProps } from "./pagination";
 
 const CardStyled = styled(motion.div)`
   position: relative;
@@ -120,6 +125,15 @@ const CardStyled = styled(motion.div)`
   }
 `;
 
+type Card = {
+  imageUrl: string;
+  title: string;
+  category: string;
+  type: string;
+  date: Date | string;
+  key: string;
+} & HTMLMotionProps<"div">;
+
 export const Card = ({
   imageUrl,
   title,
@@ -130,38 +144,41 @@ export const Card = ({
   style,
   key,
   ..._rest
-}) => {
-  const pagination = useContext(PaginationContext);
-  const controls = useAnimation();
-
-  useEffect(() => {
-    controls.start(i => ({
-      y: 0,
-      display: pagination.isInRange(i) ? "block" : "none",
-      opacity: i + 1,
-      transition: {
-        delay: i * 0.03 + 0.3
-      }
-    }));
-  }, [true]);
+}: Card) => {
+  const pagination = useContext(PaginationContext) as Required<
+    PaginationContextProps
+  >;
 
   const item = {
-    enter: (index: number) => ({ x: index > 0 ? 1000 : -1000, opacity: 0 }),
-    center: {
+    enter: (index: number) => ({
+      x: index > 0 ? 1000 : -1000,
+      // opacity: 0,
+      display: "none"
+    }),
+    center: (index: number) => ({
+      display: "block",
       zIndex: 1,
       x: 0,
-      opacity: 1
-    },
+      opacity: 1,
+      transition: {
+        delay: (index % 3) * 0.4
+      }
+    }),
     exit: (index: number) => ({
       zIndex: 0,
+      display: "none",
       x: index < 0 ? 1000 : -1000,
-      opacity: 0
+      opacity: 0,
+      transition: {
+        delay: (index % 3) * 0.3
+      }
     })
   };
 
   return (
     <CardStyled
       key={key}
+      variants={item}
       className="card large-4 medium-12 columns"
       initial="enter"
       animate="center"
