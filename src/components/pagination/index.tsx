@@ -1,5 +1,7 @@
 import React, { Props, useState, useEffect, useCallback } from "react";
 
+export type Direction = "right" | "left";
+
 export type PaginationContextProps = {
   next: () => void;
   previous: () => void;
@@ -11,6 +13,7 @@ export type PaginationContextProps = {
   isInRange: (index: number) => boolean;
   initializeCards: (newCards: unknown[] | unknown) => void;
   numberOfPages: number;
+  exitDirection: Direction;
 };
 
 export const PaginationContext = React.createContext<
@@ -25,35 +28,33 @@ export const PaginationProvider = <T extends object>({
   const [pagination, setPageSelected] = useState<{
     pageSelected: number;
     cards: unknown[];
-  }>({ pageSelected: -1, cards: [] });
-  const { pageSelected, cards } = pagination;
+    exitDirection: Direction;
+  }>({ pageSelected: -1, exitDirection: "right", cards: [] });
+  const { pageSelected, exitDirection, cards } = pagination;
   const [upperBound, setUpperBound] = useState(0);
 
+  const getExitDirection = (newPagenumber: number): Direction =>
+    newPagenumber >= pageSelected ? "left" : "right";
+
   const next = () => {
-    if (pageSelected + 1 < upperBound) {
+    const nextPage = pageSelected + 1;
+    if (nextPage < upperBound) {
       setPageSelected({
+        exitDirection: getExitDirection(nextPage),
         pageSelected: pageSelected + 1,
         cards: cardList.filter((_, i) => isInRange(i, pageSelected + 1))
       });
-      console.log(
-        "next",
-        cardList,
-        cardList.filter((_, i) => isInRange(i, pageSelected + 1))
-      );
     }
   };
 
   const previous = () => {
-    if (pageSelected - 1 >= 0) {
+    const nextPage = pageSelected - 1;
+    if (nextPage >= 0) {
       setPageSelected({
+        exitDirection: getExitDirection(nextPage),
         pageSelected: pageSelected - 1,
         cards: cardList.filter((_, i) => isInRange(i, pageSelected - 1))
       });
-      console.log(
-        "previous",
-        cardList,
-        cardList.filter((_, i) => isInRange(i, pageSelected - 1))
-      );
     }
   };
 
@@ -66,11 +67,11 @@ export const PaginationProvider = <T extends object>({
   const initializeCards = (newCards: unknown[] | unknown) => {
     cardList = Array.isArray(newCards) ? [...newCards] : [newCards];
     setPageSelected({
+      exitDirection: getExitDirection(0),
       pageSelected: 0,
       cards: cardList.filter((_, i) => isInRange(i, 0))
     });
     setUpperBound(Math.round(cardList.length / 3));
-    console.log("initializeCards", cardList);
   };
 
   // useEffect(() => {
@@ -93,11 +94,13 @@ export const PaginationProvider = <T extends object>({
         pageSelected,
         setPageSelected: (page: number) =>
           setPageSelected({
+            exitDirection: getExitDirection(page) ? "right" : "left",
             pageSelected: page,
             cards: cardList.filter((_, i) => isInRange(i, page))
           }),
         isInRange,
-        numberOfPages: upperBound
+        numberOfPages: upperBound,
+        exitDirection: exitDirection
       }}
     >
       {children}

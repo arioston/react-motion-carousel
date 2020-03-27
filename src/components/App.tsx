@@ -7,6 +7,7 @@ import { Card } from "./Card";
 
 import { cards } from "../data/cards";
 import { PaginationProvider } from "./pagination";
+import { MostRecent } from "./MostRecents";
 
 const GlobalStyle = createGlobalStyle`
   html {
@@ -99,20 +100,22 @@ export const App = () => {
     <ThemeProvider theme={theme}>
       <Container>
         <PaginationProvider>
-          <Header />
-          <SliderContainer>
-            {cards.map((c, i) => (
-              <Card
-                custom={i}
-                key={String(c.id)}
-                imageUrl={c.imageUrl}
-                title={c.title}
-                category={c.category}
-                type={c.type}
-                date={c.date}
-              />
-            ))}
-          </SliderContainer>
+          <MostRecent>
+            <Header />
+            <SliderContainer>
+              {cards.map((c, i) => (
+                <Card
+                  custom={i}
+                  key={String(c.id)}
+                  imageUrl={c.imageUrl}
+                  title={c.title}
+                  category={c.category}
+                  type={c.type}
+                  date={c.date}
+                />
+              ))}
+            </SliderContainer>
+          </MostRecent>
         </PaginationProvider>
       </Container>
       <GlobalStyle />

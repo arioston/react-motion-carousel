@@ -149,11 +149,13 @@ export const Card = ({
     PaginationContextProps
   >;
 
+  const calcDelay = (index: number) => (index % 3) * 0.1;
+  const exitLeft = () => pagination.exitDirection == "left";
+
   const item = {
     enter: (index: number) => ({
-      x: index > 0 ? 1000 : -1000,
-      // opacity: 0,
-      display: "none"
+      x: exitLeft() ? 1000 : -1000,
+      opacity: 0
     }),
     center: (index: number) => ({
       display: "block",
@@ -161,16 +163,15 @@ export const Card = ({
       x: 0,
       opacity: 1,
       transition: {
-        delay: (index % 3) * 0.4
+        delay: calcDelay(index)
       }
     }),
     exit: (index: number) => ({
       zIndex: 0,
-      display: "none",
-      x: index < 0 ? 1000 : -1000,
+      x: exitLeft() ? -1000 : 1000,
       opacity: 0,
       transition: {
-        delay: (index % 3) * 0.3
+        delay: exitLeft() ? calcDelay(index) : 0.3 - calcDelay(index)
       }
     })
   };
@@ -179,7 +180,7 @@ export const Card = ({
     <CardStyled
       key={key}
       variants={item}
-      className="card large-4 medium-12 columns"
+      className="card medium-12 columns"
       initial="enter"
       animate="center"
       exit="exit"

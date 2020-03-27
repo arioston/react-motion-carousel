@@ -3,57 +3,43 @@ import styled from "styled-components";
 import { range } from "ramda";
 import PaginationContext, { PaginationContextProps } from "./pagination";
 
-const StyledHeader = styled.div`
+export const Circle = ({ index, handlerCircleClick, pageSelected }: any) => {
+  return (
+    <div
+      onClick={() => handlerCircleClick(index)}
+      key={index}
+      className="page-circle-container"
+    >
+      <div
+        className={`page-circle page-circle-${index} ${
+          index === pageSelected ? "active" : ""
+        }`}
+      />
+    </div>
+  );
+};
+
+const TitleHeader = styled.div`
+  font-size: 1.8em;
+  height: 42px;
+  line-height: 42px;
+  font-weight: 900;
   display: flex;
-  position: relative;
-  padding-top: 50px;
-  padding-bottom: 20px;
 
-  .title {
-    font-size: 40px;
-    height: 42px;
-    line-height: 42px;
-    font-weight: 900;
-    display: flex;
+  @media print, screen and (min-width: 40em) {
     background-image: linear-gradient(#7c7b7b 33%, hsla(0, 0%, 100%, 0) 0);
-  }
-
-  .sub-title {
-    display: flex;
-    background-image: linear-gradient(#7c7b7b 33%, hsla(0, 0%, 100%, 0) 0);
-    color: #7c7b7b;
-    font-weight: 900;
-    font-size: 12px;
-    text-transform: uppercase;
-    display: none;
-    -ms-flex-align: center;
-    align-items: center;
-    letter-spacing: 3px;
-    height: 42px;
-  }
-
-  .title,
-  .sub-title {
-    width: 33%;
     background-position: 100%;
     background-size: 1.5px 4px;
     background-repeat: repeat-y;
   }
+`;
 
-  .pagination {
-    width: 33%;
-    display: flex;
-    align-self: center;
-    justify-content: space-between;
-    text-align: center;
-    align-items: center;
-  }
-
-  .counter {
-    color: #5a5953;
-    font-weight: 900;
-    font-size: 16px;
-  }
+const PaginationStyled = styled.div`
+  display: flex;
+  align-self: center;
+  justify-content: space-between;
+  text-align: center;
+  align-items: center;
 
   .circles {
     display: inline-block;
@@ -92,36 +78,48 @@ const StyledHeader = styled.div`
       }
     }
   }
+`;
 
+const SubTitleStyled = styled.div`
+  display: flex;
+  padding: 0 50px;
+  background-image: linear-gradient(#7c7b7b 33%, hsla(0, 0%, 100%, 0) 0);
+  color: #7c7b7b;
+  font-weight: 900;
+  font-size: 12px;
+  text-transform: uppercase;
+  -ms-flex-align: center;
+  align-items: center;
+  letter-spacing: 3px;
+  height: 42px;
+
+  background-position: 100%;
+  background-size: 1.5px 4px;
+  background-repeat: repeat-y;
+  /*
   @media print, screen and (min-width: 40em) {
-    .sub-title {
-      display: -ms-flexbox;
-      display: flex;
-    }
+    display: -ms-flexbox;
+    display: flex;
   }
 
   @media print, screen and (min-width: 60em) {
-    .sub-title {
-      padding: 0 50px;
+    padding: 0 50px;
+  } */
+`;
+
+const StyledHeader = styled.div`
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr;
+
+  @media print, screen and (max-width: 40em) {
+    ${TitleHeader} {
+      grid-column: span 2;
+    }
+    ${PaginationStyled}, ${SubTitleStyled} {
+      display: none;
     }
   }
 `;
-
-export const Circle = ({ index, handlerCircleClick, pageSelected }: any) => {
-  return (
-    <div
-      onClick={() => handlerCircleClick(index)}
-      key={index}
-      className="page-circle-container"
-    >
-      <div
-        className={`page-circle page-circle-${index} ${
-          index === pageSelected ? "active" : ""
-        }`}
-      />
-    </div>
-  );
-};
 
 export const Header = ({ handlerCircleClick }: any) => {
   const pagination = useContext(PaginationContext) as Required<
@@ -130,10 +128,12 @@ export const Header = ({ handlerCircleClick }: any) => {
 
   const circleList = range(0, pagination.numberOfPages);
   return (
-    <StyledHeader className="row">
-      <div className="title">Most Recent</div>
-      <div className="sub-title">Blog posts, Publications and talks</div>
-      <div className="pagination">
+    <StyledHeader>
+      <TitleHeader className="title">Most Recent</TitleHeader>
+      <SubTitleStyled className="sub-title">
+        Blog posts, Publications and talks
+      </SubTitleStyled>
+      <PaginationStyled className="pagination">
         <div className="circles">
           {circleList.map((index: number) => (
             <Circle
@@ -149,7 +149,7 @@ export const Header = ({ handlerCircleClick }: any) => {
           /{" "}
           <span className="slide-total">{`0${pagination.numberOfPages}`}</span>
         </div>
-      </div>
+      </PaginationStyled>
     </StyledHeader>
   );
 };
