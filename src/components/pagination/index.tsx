@@ -29,12 +29,19 @@ export const PaginationProvider = <T extends object>({
     pageSelected: number;
     cards: unknown[];
     exitDirection: Direction;
-  }>({ pageSelected: -1, exitDirection: "right", cards: [] });
+  }>({ pageSelected: 0, exitDirection: "right", cards: [] });
   const { pageSelected, exitDirection, cards } = pagination;
   const [upperBound, setUpperBound] = useState(0);
 
-  const getExitDirection = (newPagenumber: number): Direction =>
-    newPagenumber >= pageSelected ? "left" : "right";
+  const getExitDirection = (newPagenumber: number): Direction => {
+    console.log(pageSelected, newPagenumber, upperBound);
+    if (pageSelected == 0) {
+      return "left";
+    } else if (pageSelected == upperBound - 1) {
+      return "right";
+    }
+    return newPagenumber > pageSelected ? "left" : "right";
+  };
 
   const next = () => {
     const nextPage = pageSelected + 1;
@@ -74,16 +81,6 @@ export const PaginationProvider = <T extends object>({
     setUpperBound(Math.round(cardList.length / 3));
   };
 
-  // useEffect(() => {
-  //   setTimeout(() => {
-  //     setPageSelected({
-  //       pageSelected,
-  //       cards: cardList.filter((_, i) => isInRange(i))
-  //     });
-  //     console.log("useEffect", pageSelected, cards);
-  //   }, 100);
-  // }, [pageSelected]);
-
   return (
     <PaginationContext.Provider
       value={{
@@ -94,7 +91,7 @@ export const PaginationProvider = <T extends object>({
         pageSelected,
         setPageSelected: (page: number) =>
           setPageSelected({
-            exitDirection: getExitDirection(page) ? "right" : "left",
+            exitDirection: getExitDirection(page),
             pageSelected: page,
             cards: cardList.filter((_, i) => isInRange(i, page))
           }),

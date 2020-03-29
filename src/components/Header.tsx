@@ -78,6 +78,11 @@ const PaginationStyled = styled.div`
       }
     }
   }
+  .counter {
+    color: #5a5953;
+    font-weight: 900;
+    font-size: 16px;
+  }
 `;
 
 const SubTitleStyled = styled.div`
@@ -137,6 +142,7 @@ export const Header = ({ handlerCircleClick }: any) => {
         <div className="circles">
           {circleList.map((index: number) => (
             <Circle
+              key={index}
               index={index}
               handlerCircleClick={handlerCircleClick}
               pageSelected={pagination.pageSelected}

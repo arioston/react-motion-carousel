@@ -92,7 +92,8 @@ const GlobalStyle = createGlobalStyle`
 
 const theme = {
   background: "#232122",
-  color: "#fff"
+  color: "#fff",
+  hoverColor: "#09f"
 };
 
 export const App = () => {

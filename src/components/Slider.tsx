@@ -31,7 +31,7 @@ export const SliderContainer = <P extends object>({ children }: Props<P>) => {
 
   return (
     <SliderStyled className="dark">
-      <AnimatePresence initial={false} exitBeforeEnter={true}>
+      <AnimatePresence initial={false} exitBeforeEnter>
         {pagination.cards}
       </AnimatePresence>
     </SliderStyled>
